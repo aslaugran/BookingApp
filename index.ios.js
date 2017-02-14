@@ -5,6 +5,7 @@
  */
 
 import React, { Component } from 'react';
+import Swiper from 'react-native-swiper';
 import {
   AppRegistry,
   StyleSheet,
@@ -13,7 +14,10 @@ import {
   Image,
   ScrollView,
   Button,
-  Alert
+  StatusBar,
+  TextInput,
+  Alert,
+  Modal
 } from 'react-native';
 
 
@@ -29,26 +33,6 @@ class TourCategory extends Component {
       <View style={styles.tourcategorycard}>
         <Text>
           Adventure Tours
-        </Text>
-      </View>
-    )
-
-  }
-}
-
-
-// Tour Search
-
-class TourSearch extends Component {
-  constructor (){
-        super();
-  }
-
-  render() {
-    return (
-      <View style={styles.searchtours}>
-        <Text>
-          Search Tours
         </Text>
       </View>
     )
@@ -113,67 +97,180 @@ class TourList extends Component {
   }
 }
 
-// Tour Booking
 
-class TourBooking extends Component {
+// Buttons
+
+const onButtonPress = () => {
+  Alert.alert('Button has been pressed!');
+};
+
+const openModal = (visible) => {
+  this.setState({modalVisible: visible});
+};
+
+class ButtonGroup extends Component {
   constructor (){
         super();
   }
 
+  state = {
+    animationType: 'none',
+    modalVisible: false,
+    transparent: false,
+    selectedSupportedOrientation: 0,
+    currentOrientation: 'unknown',
+  };
+
+
+  _setModalVisible = (visible) => {
+    this.setState({modalVisible: visible});
+  };
+
   render() {
     return (
-      <View style={styles.searchtours}>
-        <Text>
-          Search Tours
-        </Text>
-      </View>
+      <View>
+      <Button onPress={this._setModalVisible.bind(this, true)} title='button'>
+         Present
+       </Button>
+     </View>
     )
 
   }
 }
 
-// Buttons
+class ModalExample extends React.Component {
+  state = {
+    animationType: 'none',
+    modalVisible: false,
+    transparent: false,
+    selectedSupportedOrientation: 0,
+    currentOrientation: 'unknown',
+  };
 
-const onButtonPress = () => {
-Alert.alert('Button has been pressed!');
-};
+  _setModalVisible = (visible) => {
+    this.setState({modalVisible: visible});
+  };
 
-class ButtonGroup extends Component {
-  constructor(props, context) {
-    super(props, context);
+  _setAnimationType = (type) => {
+    this.setState({animationType: type});
+  };
+
+  _toggleTransparent = () => {
+    this.setState({transparent: !this.state.transparent});
+  };
+
+  render() {
+    var modalBackgroundStyle = {
+      backgroundColor: this.state.transparent ? 'rgba(0, 0, 0, 0.5)' : '#f5fcff',
+    };
+    var innerContainerTransparentStyle = this.state.transparent
+      ? {backgroundColor: '#fff', padding: 20}
+      : null;
+    var activeButtonStyle = {
+      backgroundColor: '#ddd'
+    };
+
+    return (
+      <View>
+        <Modal
+          animationType={this.state.animationType}
+          transparent={this.state.transparent}
+          visible={this.state.modalVisible}
+          onRequestClose={() => this._setModalVisible(false)}
+          onOrientationChange={evt => this.setState({currentOrientation: evt.nativeEvent.orientation})}
+          >
+          <View style={[styles.container, modalBackgroundStyle]}>
+            <View style={[styles.innerContainer, innerContainerTransparentStyle]}>
+              <Text>This modal was presented {this.state.animationType === 'none' ? 'without' : 'with'} animation.</Text>
+              <Text>It is currently displayed in {this.state.currentOrientation} mode.</Text>
+              <Button
+                onPress={this._setModalVisible.bind(this, false)}
+                style={styles.modalButton}
+                title='close'>
+                Close
+              </Button>
+            </View>
+          </View>
+        </Modal>
+        <View style={styles.row}>
+          <Text style={styles.rowTitle}>Animation Type</Text>
+          <Button title='none' onPress={this._setAnimationType.bind(this, 'none')} style={this.state.animationType === 'none' ? activeButtonStyle : {}}>
+            none
+          </Button>
+          <Button title='slide' onPress={this._setAnimationType.bind(this, 'slide')} style={this.state.animationType === 'slide' ? activeButtonStyle : {}}>
+            slide
+          </Button>
+          <Button title='fade' onPress={this._setAnimationType.bind(this, 'fade')} style={this.state.animationType === 'fade' ? activeButtonStyle : {}}>
+            fade
+          </Button>
+        </View>
+
+        <View style={styles.row}>
+          <Text style={styles.rowTitle}>Transparent</Text>
+        </View>
+
+        <View>
+          <Text style={styles.rowTitle}>Supported orientations</Text>
+        </View>
+
+        <Button title='present' onPress={this._setModalVisible.bind(this, true)}>
+          Present
+        </Button>
+      </View>
+    );
   }
+}
+
+
+// Tour Search
+
+class TourSearch extends Component {
+  state = {
+    searchingTour: '',
+  };
+
+  searchTours (value) {
+    this.state.searchingTour = value;
+    console.log(value);
+    this.setState(this.state);
+  }
+
+
   render() {
     return (
-      <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
-         <Button
-           onPress={onButtonPress}
-           title="This looks great!"
-           accessibilityLabel="This sounds great!"
-         />
-       </View>
-    );
+    <TextInput
+      style={styles.textInput}
+      onChangeText={this.searchTours.bind(this)}>
+    </TextInput>
+    )
+
   }
 }
 
 // Tour Card
 
-class TourCard extends Component {
+class TourCategoryCard extends Component {
   constructor (){
         super();
+        const onButtonPress = () => {
+        Alert.alert('Button has been pressed!');
+        };
   }
 
   render() {
     return (
-      <View style={styles.tourcard}>
-      <Image source={{uri: this.props.tour.main_photo}}
-       style={styles.tourimage} />
-       <Text style={styles.tourname}>
-         {this.props.tour.name}
-       </Text>
-       <Text style={styles.tourduration}>
-         Duration: {this.props.tour.duration} hours / Price from {this.props.tour.adult_price} ISK
-       </Text>
-       <ButtonGroup />
+      <View style={styles.slide}>
+        <View style={styles.tourcategorycard}>
+          <Image source={{uri: this.props.tour.main_photo}}
+            style={styles.tourimage} />
+            <Text style={styles.tourname}>
+              {this.props.tour.name}
+            </Text>
+            <Text style={styles.tourduration}>
+              Duration: {this.props.tour.duration} hours / Price from {this.props.tour.adult_price} ISK
+            </Text>
+            <ButtonGroup />
+          </View>
       </View>
     )
 
@@ -190,6 +287,7 @@ class BookingApp extends Component {
     }
   }
 
+
   getTours (){
     return fetch('http://localhost:3001/daytours')
       .then((response) => response.json())
@@ -204,23 +302,54 @@ class BookingApp extends Component {
 
   render() {
     return (
-      <ScrollView>
-          {this.state.data.map (res => <TourCard tour={res}/>)}
-      </ScrollView>
+        <TourSearch />,
+        <Swiper showsButtons={true}>
+          {this.state.data.map (res => <TourCategoryCard tour={res}/>)}
+        </Swiper>
     );
   }
 }
 
+var swiper = React.createClass({
+  render: function() {
+    return (
+      <Swiper style={styles.wrapper} showsButtons={true}>
+
+        <View style={styles.slide1}>
+          <Text style={styles.text}>Hello Swiper</Text>
+        </View>
+        <View style={styles.slide2}>
+          <Text style={styles.text}>Beautiful</Text>
+        </View>
+        <View style={styles.slide3}>
+          <Text style={styles.text}>And simple</Text>
+        </View>
+      </Swiper>
+    )
+  }
+})
+
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    margin: 30,
+  },
+  slide: {
+    flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#F5FCFF',
+    backgroundColor: '#9DD6EB',
   },
-  tourcategorycard: {
-    width: 100,
-    height: 450,
+  textInput: {
+    textAlign: 'left',
+    color: '#555555',
+    margin: 5,
+    height: 35,
+    paddingLeft: 10,
+    borderColor: '#f3f3f3',
+    backgroundColor: '#f3f3f3',
+    borderWidth: 1,
   },
   tourimage: {
     width: 300,
@@ -228,22 +357,23 @@ const styles = StyleSheet.create({
   },
   tourname: {
     fontSize: 24,
-    paddingTop: 25,
+    paddingTop: 15,
     textAlign: 'center',
   },
   tourduration: {
-    paddingBottom: 25,
+    paddingBottom: 15,
   },
-  tourcard: {
+  tourcategorycard: {
     backgroundColor: '#f3f3f3',
-    height: 400,
+    flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
+    marginBottom: 25,
   },
   tourimage: {
     width: 400,
-    height: 300,
+    height: 400,
   },
 });
 
-AppRegistry.registerComponent('BookingApp', () => BookingApp);
+AppRegistry.registerComponent('BookingApp', () => ModalExample);
