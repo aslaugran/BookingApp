@@ -121,7 +121,6 @@ let baseComponent = {}
 const onButtonPress = () => {
   console.log (baseComponent);
   baseComponent.setState({scenes: "Adventue"});
-  Alert.alert('Navigate to Tour List');
 
 };
 
@@ -159,20 +158,7 @@ class ButtonGroup extends Component {
   }
 }
 
-// Tour Card inní Adventure - Ása
 
-class TourCard extends Component {
-  constructor (){
-        super();
-        const onButtonPress = () => {
-        Alert.alert('Single TourCard');
-        };
-  }
-
-  render() {
-    return (<Text>Halló Hermann</Text>);
-  }
-}
 
 
 
@@ -362,7 +348,6 @@ class ToursCategory extends Component {
 
 // MAIN - Base Component
 
-
 class BookingApp extends Component {
   constructor (){
     super();
@@ -375,6 +360,10 @@ class BookingApp extends Component {
   }
 
 // Kalla á allar ferðir í Adventure flokk - Ása og Hermann
+changeData (data){
+  this.setState({data: data});
+}
+
 getScene (){
   if (!this.state.scenes) {
     return(
@@ -391,26 +380,63 @@ getScene (){
       <View style={styles.maincontainer}>
         <Text style={styles.categoryheading}>Adventure</Text>
         <Text style={styles.categoryintro}>Experience Iceland with our trusted guidance</Text>
-        {this.state.data.map (res => <TourCard category={res}/>)}
+        {this.state.data.map ((res, i) => {
+          res.i=i;
+          return <TourCard tour={res} changedata={this.changeData}/>
+          })
+        }
       </View>
     )
   }
 }
 
-  getCategories (){
-    return fetch('http://localhost:3001/daytours/categories')
+getCategories (){
+  return fetch('http://localhost:3001/daytours/categories')
+    .then((response) => response.json())
+    .then((responseJson) => {
+      this.setState ({data: responseJson});
+      return responseJson.categories;
+    })
+    .catch((error) => {
+      console.error(error);
+    });
+  }
+
+  render() {
+    return this.getScene()
+  }
+}
+
+// Tour Card inní Adventure - Ása
+
+class TourCard extends Component {
+  constructor (){
+    super();
+    this.state={
+      data: []
+    }
+  }
+  componentDidMount (){
+    return fetch('http://localhost:3001/daytours')
       .then((response) => response.json())
       .then((responseJson) => {
-        this.setState ({data: responseJson});
-        return responseJson.categories;
+        this.setState({data: responseJson});
+        return responseJson;
       })
       .catch((error) => {
         console.error(error);
       });
   }
-
   render() {
-    return this.getScene()
+    return (
+      <View style={styles.tourcard}>
+        {/* <Image source={{uri: this.state.main_photo}}
+          style={styles.tourimage} /> */}
+        <Text style={styles.tourname}>
+          {this.state.data.length>0?this.state.data[this.props.tour.i].name: null}
+        </Text>
+      </View>
+    );
   }
 }
 
