@@ -107,8 +107,8 @@ constructor (){
 
   render() {
     return (
-      <View style={styles.}>
-            {this.state.data.map (res => <TourCard key={res.total} category={res}/>)}
+      <View>
+            {this.state.data.map (res => <TourCard category={res}/>)}
       </View>
     )
 
@@ -117,9 +117,12 @@ constructor (){
 
 
 // Buttons
-
+let baseComponent = {}
 const onButtonPress = () => {
-  Alert.alert('Button has been pressed!');
+  console.log (baseComponent);
+  baseComponent.setState({scenes: "Adventue"});
+  Alert.alert('Navigate to Tour List');
+
 };
 
 const openModal = (visible) => {
@@ -156,38 +159,18 @@ class ButtonGroup extends Component {
   }
 }
 
-// Tour Tour Card // ÁSA
+// Tour Card inní Adventure - Ása
 
-class TourCategoryCard extends Component {
+class TourCard extends Component {
   constructor (){
         super();
         const onButtonPress = () => {
-        Alert.alert('Button has been pressed!');
+        Alert.alert('Single TourCard');
         };
   }
 
   render() {
-    return (
-        <View style={styles.tourcategorycard}>
-          <Image source={{uri: this.props.category.photo}}
-            style={styles.categoryimage} />
-            <Text style={styles.categoryname}>
-              {this.props.category.name}
-            </Text>
-            <Text style={styles.categorynumber}>
-              {this.props.category.total}
-            </Text>
-            <View style={styles.buttoncontainer}>
-            <Button
-          onPress={onButtonPress}
-          title="More Info"
-          accessibilityLabel="More Information"
-          color='white'
-        />
-        </View>
-          </View>
-    )
-
+    return (<Text>Halló Hermann</Text>);
   }
 }
 
@@ -377,7 +360,7 @@ class ToursCategory extends Component {
 }
 
 
-// MAIN
+// MAIN - Base Component
 
 
 class BookingApp extends Component {
@@ -385,10 +368,34 @@ class BookingApp extends Component {
     super();
     this.getCategories();
     this.state = {
-      data: []
+      data: [],
+      scenes: ""
     }
+    baseComponent = this;
   }
 
+// Kalla á allar ferðir í Adventure flokk - Ása og Hermann
+getScene (){
+  if (!this.state.scenes) {
+    return(
+      <View style={styles.maincontainer}>
+        <Text style={styles.categoryheading}>Our Day Tours Selection</Text>
+        <Text style={styles.categoryintro}>Experience Iceland with our trusted guidance</Text>
+        <Swiper>
+          {this.state.data.map (res => <TourCategoryCard key={res.total} category={res}/>)}
+        </Swiper>
+      </View>
+    )
+  } else if (this.state.scenes === "Adventue"){
+    return(
+      <View style={styles.maincontainer}>
+        <Text style={styles.categoryheading}>Adventure</Text>
+        <Text style={styles.categoryintro}>Experience Iceland with our trusted guidance</Text>
+        {this.state.data.map (res => <TourCard category={res}/>)}
+      </View>
+    )
+  }
+}
 
   getCategories (){
     return fetch('http://localhost:3001/daytours/categories')
@@ -403,15 +410,7 @@ class BookingApp extends Component {
   }
 
   render() {
-    return (
-      <View style={styles.maincontainer}>
-        <Text style={styles.categoryheading}>Our Day Tours Selection</Text>
-        <Text style={styles.categoryintro}>Experience Iceland with our trusted guidance</Text>
-        <Swiper>
-          {this.state.data.map (res => <TourCategoryCard key={res.total} category={res}/>)}
-        </Swiper>
-      </View>
-    );
+    return this.getScene()
   }
 }
 
@@ -461,6 +460,8 @@ class BookingApp extends Component {
 //       }
 // }
 
+
+// Styles
 const styles = StyleSheet.create({
   maincontainer: {
     backgroundColor: '#f2f2f2',
