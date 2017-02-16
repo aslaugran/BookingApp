@@ -4,6 +4,8 @@
  * @flow
  */
 
+ // PUSHING TO GIT
+
 import React, { Component } from 'react';
 import Swiper from 'react-native-swiper';
 import {
@@ -17,7 +19,9 @@ import {
   StatusBar,
   TextInput,
   Alert,
-  Modal
+  Modal,
+  Navigator,
+  TouchableHighlight
 } from 'react-native';
 
 
@@ -247,6 +251,8 @@ class TourSearch extends Component {
   }
 }
 
+
+
 // Tour Card
 
 class TourCategoryCard extends Component {
@@ -259,19 +265,24 @@ class TourCategoryCard extends Component {
 
   render() {
     return (
-      <View style={styles.slide}>
         <View style={styles.tourcategorycard}>
-          <Image source={{uri: this.props.tour.main_photo}}
-            style={styles.tourimage} />
-            <Text style={styles.tourname}>
-              {this.props.tour.name}
+          <Image source={{uri: this.props.category.photo}}
+            style={styles.categoryimage} />
+            <Text style={styles.categoryname}>
+              {this.props.category.name}
             </Text>
-            <Text style={styles.tourduration}>
-              Duration: {this.props.tour.duration} hours / Price from {this.props.tour.adult_price} ISK
+            <Text style={styles.categorynumber}>
+              {this.props.category.total}
             </Text>
-            <ButtonGroup />
+            <View style={styles.buttoncontainer}>
+            <Button
+          onPress={onButtonPress}
+          title="More Info"
+          accessibilityLabel="More Information"
+          color='white'
+        />
+        </View>
           </View>
-      </View>
     )
 
   }
@@ -281,19 +292,19 @@ class TourCategoryCard extends Component {
 class BookingApp extends Component {
   constructor (){
     super();
-    this.getTours();
+    this.getCategories();
     this.state = {
       data: []
     }
   }
 
 
-  getTours (){
-    return fetch('http://localhost:3001/daytours')
+  getCategories (){
+    return fetch('http://localhost:3001/daytours/categories')
       .then((response) => response.json())
       .then((responseJson) => {
         this.setState ({data: responseJson});
-        return responseJson.tours;
+        return responseJson.categories;
       })
       .catch((error) => {
         console.error(error);
@@ -302,78 +313,123 @@ class BookingApp extends Component {
 
   render() {
     return (
-        <TourSearch />,
-        <Swiper showsButtons={true}>
-          {this.state.data.map (res => <TourCategoryCard tour={res}/>)}
+      <View style={styles.maincontainer}>
+        <Text style={styles.categoryheading}>Our Day Tours Selection</Text>
+        <Text style={styles.categoryintro}>Experience Iceland with our trusted guidance</Text>
+        <Swiper>
+          {this.state.data.map (res => <TourCategoryCard key={res.total} category={res}/>)}
         </Swiper>
+      </View>
     );
   }
 }
 
-var swiper = React.createClass({
-  render: function() {
-    return (
-      <Swiper style={styles.wrapper} showsButtons={true}>
-
-        <View style={styles.slide1}>
-          <Text style={styles.text}>Hello Swiper</Text>
-        </View>
-        <View style={styles.slide2}>
-          <Text style={styles.text}>Beautiful</Text>
-        </View>
-        <View style={styles.slide3}>
-          <Text style={styles.text}>And simple</Text>
-        </View>
-      </Swiper>
-    )
-  }
-})
-
+// class BookingApp extends Component {
+//   constructor (){
+//     super();
+//     this.getCategories();
+//         this.state = {
+//           data: []
+//         }
+//     }
+//
+//     getCategories (){
+//         return fetch('http://localhost:3001/daytours/categories')
+//           .then((response) => response.json())
+//           .then((responseJson) => {
+//             this.setState ({data: responseJson});
+//             return responseJson.categories;
+//           })
+//           .catch((error) => {
+//             console.error(error);
+//           });
+//       }
+//   render() {
+//           const routes = [
+//             {title: 'Our Day Tours Selection', index: 0},
+//             {title: 'Adventure',  index: 1},
+//           ];
+//           return (
+//       <Navigator style={styles.navigator}
+//       initialRoute={routes[0]}
+//       initialRouteStack={routes}
+//       renderScene={(route, navigator) =>
+//         <TouchableHighlight onPress={() => {
+//           if (route.index === 0) {
+//             navigator.push(routes[1]);
+//           } else {
+//             navigator.pop();
+//           }
+//         }}>
+//         <Text style={styles.categoryheading}>{route.title}</Text>
+//         </TouchableHighlight>
+//       }
+//       style={{padding: 100}}
+//     />
+//   );
+//       }
+// }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    margin: 30,
+  maincontainer: {
+    backgroundColor: '#f2f2f2',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  buttoncontainer: {
+    backgroundColor: '#4A4A4A',
+    width: 250,
+    height: 60,
+    borderBottomLeftRadius: 15,
+    borderBottomRightRadius: 15,
+    paddingTop: 10,
+  },
+  categoryintro: {
+    fontSize: 17,
+    width: 250,
+    lineHeight: 20,
+    paddingBottom: 25,
+  },
+  categoryheading: {
+    fontSize: 31,
+    color: '#6c6c6c',
+    lineHeight: 32,
+    width: 250,
+    fontWeight: 'bold',
+    paddingTop: 150,
   },
   slide: {
-    flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#9DD6EB',
-  },
-  textInput: {
-    textAlign: 'left',
-    color: '#555555',
-    margin: 5,
-    height: 35,
-    paddingLeft: 10,
-    borderColor: '#f3f3f3',
-    backgroundColor: '#f3f3f3',
-    borderWidth: 1,
-  },
-  tourimage: {
-    width: 300,
-    height: 300,
-  },
-  tourname: {
-    fontSize: 24,
-    paddingTop: 15,
-    textAlign: 'center',
-  },
-  tourduration: {
-    paddingBottom: 15,
+    paddingTop: 0,
   },
   tourcategorycard: {
-    backgroundColor: '#f3f3f3',
-    flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    marginBottom: 25,
+    height: 360,
   },
-  tourimage: {
-    width: 400,
-    height: 400,
+  categoryimage: {
+    width: 250,
+    height: 300,
   },
+  categoryname: {
+    fontSize: 30,
+    lineHeight: 29,
+    fontWeight: 'bold',
+    position: 'absolute',
+    left: 96,
+    top: 32,
+    color: 'white',
+    width: 180,
+  },
+  categorynumber: {
+    color: 'white',
+    fontSize: 30,
+    fontWeight: 'bold',
+    position: 'absolute',
+    right: 96,
+    top: 245,
+  }
 });
 
-AppRegistry.registerComponent('BookingApp', () => ModalExample);
+AppRegistry.registerComponent('BookingApp', () => BookingApp);
