@@ -82,19 +82,33 @@ class TourDetails extends Component {
   }
 }
 
-// Tour List
+// Tours List inside Category // ÁSA
 
 class TourList extends Component {
-  constructor (){
-        super();
+constructor (){
+    super();
+    this.getCategories();
+    this.state = {
+      data: []
+    }
+  }
+
+  getTours (){
+    return fetch('http://localhost:3001/daytours')
+      .then((response) => response.json())
+      .then((responseJson) => {
+        this.setState ({data: responseJson});
+        return responseJson.tours;
+      })
+      .catch((error) => {
+        console.error(error);
+      });
   }
 
   render() {
     return (
-      <View style={styles.searchtours}>
-        <Text>
-          Search Tours
-        </Text>
+      <View style={styles.}>
+            {this.state.data.map (res => <TourCard key={res.total} category={res}/>)}
       </View>
     )
 
@@ -141,6 +155,45 @@ class ButtonGroup extends Component {
 
   }
 }
+
+// Tour Tour Card // ÁSA
+
+class TourCategoryCard extends Component {
+  constructor (){
+        super();
+        const onButtonPress = () => {
+        Alert.alert('Button has been pressed!');
+        };
+  }
+
+  render() {
+    return (
+        <View style={styles.tourcategorycard}>
+          <Image source={{uri: this.props.category.photo}}
+            style={styles.categoryimage} />
+            <Text style={styles.categoryname}>
+              {this.props.category.name}
+            </Text>
+            <Text style={styles.categorynumber}>
+              {this.props.category.total}
+            </Text>
+            <View style={styles.buttoncontainer}>
+            <Button
+          onPress={onButtonPress}
+          title="More Info"
+          accessibilityLabel="More Information"
+          color='white'
+        />
+        </View>
+          </View>
+    )
+
+  }
+}
+
+
+
+// MODAL // ÁSA & HERMANN
 
 class ModalExample extends React.Component {
   state = {
@@ -226,34 +279,34 @@ class ModalExample extends React.Component {
 }
 
 
-// Tour Search
+// // Tour Search
+//
+// class TourSearch extends Component {
+//   state = {
+//     searchingTour: '',
+//   };
+//
+//   searchTours (value) {
+//     this.state.searchingTour = value;
+//     console.log(value);
+//     this.setState(this.state);
+//   }
+//
+//
+//   render() {
+//     return (
+//     <TextInput
+//       style={styles.textInput}
+//       onChangeText={this.searchTours.bind(this)}>
+//     </TextInput>
+//     )
+//
+//   }
+// }
 
-class TourSearch extends Component {
-  state = {
-    searchingTour: '',
-  };
-
-  searchTours (value) {
-    this.state.searchingTour = value;
-    console.log(value);
-    this.setState(this.state);
-  }
 
 
-  render() {
-    return (
-    <TextInput
-      style={styles.textInput}
-      onChangeText={this.searchTours.bind(this)}>
-    </TextInput>
-    )
-
-  }
-}
-
-
-
-// Tour Card
+// Tour Tour CategoryCard // SSM
 
 class TourCategoryCard extends Component {
   constructor (){
@@ -287,6 +340,44 @@ class TourCategoryCard extends Component {
 
   }
 }
+
+// Tour Tours Category // SSM
+
+class ToursCategory extends Component {
+  constructor (){
+        super();
+        const onButtonPress = () => {
+        Alert.alert('Button has been pressed!');
+        };
+  }
+
+  render() {
+    return (
+        <View style={styles.tourcategorycard}>
+          <Image source={{uri: this.props.category.photo}}
+            style={styles.categoryimage} />
+            <Text style={styles.categoryname}>
+              {this.props.category.name}
+            </Text>
+            <Text style={styles.categorynumber}>
+              {this.props.category.total}
+            </Text>
+            <View style={styles.buttoncontainer}>
+            <Button
+          onPress={onButtonPress}
+          title="More Info"
+          accessibilityLabel="More Information"
+          color='white'
+        />
+        </View>
+          </View>
+    )
+
+  }
+}
+
+
+// MAIN
 
 
 class BookingApp extends Component {
